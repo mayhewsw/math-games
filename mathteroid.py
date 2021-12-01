@@ -6,7 +6,7 @@ from math_problems import get_math_problem
 
 WIDTH = 500
 HEIGHT = 500
-ASTEROID_SPEED = 1
+ASTEROID_SPEED = 3
 
 alien = Actor('alien')
 alien.pos = WIDTH/2, HEIGHT-50
@@ -32,7 +32,6 @@ def end_game():
     global game_over
     # draw success text, maybe some statistics
     game_over = True
-    print("game is over now!")
 
 ticks_at_start = pygame.time.get_ticks()
 clock.schedule(end_game, game_length)
@@ -41,23 +40,24 @@ def get_seconds_elapsed():
     return math.floor((pygame.time.get_ticks() - ticks_at_start) / 1000.)
 
 def draw():
+    screen.clear()
+    alien.draw()
+    
+    # stats on the side of the screen
+    screen.draw.text(f"Num Correct:    {num_correct}", [10,10])
+    screen.draw.text(f"Num Questions:  {num_questions}", [10,30])
+    screen.draw.text(f"Your answer:    {key_accumulator.answer_string}", [10, 50])
+
     if not game_over:
-        screen.clear()
-        alien.draw()
         asteroid.draw()
         screen.draw.text(math_text, center=asteroid.pos, owidth=1.5, ocolor=(255,255,0), color=(0,0,0))
         
-        # stats on the side of the screen
-        screen.draw.text(f"Num Correct:    {num_correct}", [10,10])
-        screen.draw.text(f"Num Questions:  {num_questions}", [10,30])
-        screen.draw.text(f"Your answer:    {key_accumulator.answer_string}", [10, 50])
-
         seconds_elapsed = get_seconds_elapsed()
         screen.draw.text(f"{game_length - seconds_elapsed}", [10, 70])
+        
     else:
         screen.draw.text(f"Game over!", center=(WIDTH/2, HEIGHT/2), fontsize=60)
         screen.draw.text(f"Accuracy: {num_correct / num_questions:.2%}", center=(WIDTH/2, HEIGHT/2 + 40))
-
 
 
 def reset_asteroid():
@@ -91,15 +91,6 @@ def on_key_down(key):
     global streak
     global longest_streak
     global num_correct
-
-    if key == key.DOWN:
-        alien.y += 10
-    elif key == key.UP:
-        alien.y -= 10
-    elif key == key.LEFT:
-        alien.x -= 10
-    elif key == key.RIGHT:
-        alien.x += 10
 
     key_accumulator.add_key(key)
 

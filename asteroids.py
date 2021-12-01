@@ -5,7 +5,7 @@ from math_problems import get_math_problem
 
 WIDTH = 1200
 HEIGHT = 800
-NUM_ASTEROIDS = 5
+NUM_ASTEROIDS = 10
 
 key_accumulator = KeyAccumulator()
 
@@ -19,35 +19,34 @@ def generate_asteroid():
     return asteroid
 
 def reset_game():
-    global game_over
+    global game_status
     global asteroids
+    print("resetting game...")
     asteroids = [generate_asteroid() for _ in range(NUM_ASTEROIDS)]
-    game_over = False
+    game_status = "playing"
     
 alien = Actor('alien')
 alien.pos = WIDTH/2, HEIGHT/2
 asteroids = None
-game_over = None
+game_status = None
 
 reset_game()
 
 def draw():
+    screen.clear()
 
-    if len(asteroids) > 0 and not game_over:
-        screen.clear()
-
-
+    if game_status != "playing":
+        screen.draw.text(f"{game_status}", center=(WIDTH/2, HEIGHT/2 + 60), fontsize=60)  
+    elif len(asteroids) > 0:
         for asteroid in asteroids:
             asteroid.draw()
             screen.draw.text(asteroid.math_text, center=asteroid.pos, owidth=1.5, ocolor=(255,255,0), color=(0,0,0))
 
-        alien.draw()
-    else:
-        screen.draw.text(f"Game over!", center=(WIDTH/2, HEIGHT/2), fontsize=60)
-
+    alien.draw()
+    
     
 def update():
-    global game_over 
+    global game_status 
     for asteroid in asteroids:
         
         speed = 0.5 if asteroid.is_large else 1
@@ -64,14 +63,15 @@ def update():
             asteroid.y = HEIGHT
 
         if asteroid.collidepoint(alien.pos):
-            game_over = True
+            game_status = "You lose!!"
 
 def on_key_down(key):
     global key_accumulator
     global asteroids
+    global game_status
     key_accumulator.add_key(key)
 
-    if game_over:
+    if game_status != "playing":
         reset_game()
         return
 
@@ -97,3 +97,6 @@ def on_key_down(key):
                 new_asteroids.append(asteroid)
         asteroids = new_asteroids
         key_accumulator.answer_string = ""
+
+        if len(new_asteroids) == 0:
+            game_status = "You win!!!"
