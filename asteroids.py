@@ -21,8 +21,8 @@ def generate_asteroid():
 def reset_game():
     global game_status
     global asteroids
-    print("resetting game...")
     asteroids = [generate_asteroid() for _ in range(NUM_ASTEROIDS)]
+    # FIXME: turn this into an enum, or similar
     game_status = "playing"
     
 alien = Actor('alien')
